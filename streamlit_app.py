@@ -57,7 +57,7 @@ def oppdater_informasjon(innmaaling_df):
     return innmaaling_df
 
 # Del applikasjonen i to kolonner med venstre kolonne 1/4 bredde og høyre kolonne 3/4 bredde
-col1, col2 = st.columns([1, 3])
+col1, col2 = st.columns([1, 5])
 
 # Venstre kolonne: Dropdowns og valg
 with col1:
