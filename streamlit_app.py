@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import io
 
 def overskriv_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_overwrite):
     for _, rad in attributter_df.iterrows():
@@ -63,14 +64,18 @@ if uploaded_innmaaling_file and uploaded_attributter_file:
     
     koblingsnokkel = st.selectbox("Velg koblingsnøkkel", attributter_df.columns)
 
+    # Fjern de uønskede attributtene fra utvalget
+    uønskede_attributter = ["Id", "Lengde", "Lengde 3D", "Lukket", "Areal"]
+    tilgjengelige_attributter = [col for col in attributter_df.columns if col not in uønskede_attributter]
+
     if st.checkbox("Overskriv attributter"):
-        attributes_to_overwrite = st.multiselect("Velg attributter som skal overskrives", attributter_df.columns)
+        attributes_to_overwrite = st.multiselect("Velg attributter som skal overskrives", tilgjengelige_attributter)
         if st.button("Overskriv"):
             innmaaling_df = overskriv_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_overwrite)
             st.success("Attributter har blitt overskrevet.")
     
     if st.checkbox("Legg til attributter"):
-        attributes_to_add = st.multiselect("Velg attributter som skal legges til", attributter_df.columns)
+        attributes_to_add = st.multiselect("Velg attributter som skal legges til", tilgjengelige_attributter)
         if st.button("Legg til"):
             innmaaling_df = legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_add)
             st.success("Attributter har blitt lagt til.")
@@ -82,7 +87,14 @@ if uploaded_innmaaling_file and uploaded_attributter_file:
     st.write("Oppdatert DataFrame:")
     st.dataframe(innmaaling_df)
 
-    output_filename = st.text_input("Skriv inn filnavn for å lagre", "oppdatert_innmaaling.xlsx")
-    if st.button("Lagre til Excel"):
-        innmaaling_df.to_excel(output_filename, index=False)
-        st.success(f"Innmaaling er lagret som '{output_filename}'")
+    # Legg til nedlastingsknappen
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        innmaaling_df.to_excel(writer, index=False)
+    st.download_button(
+        label="Last ned oppdatert Excel-fil",
+        data=output.getvalue(),
+        file_name="oppdatert_innmaaling.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
