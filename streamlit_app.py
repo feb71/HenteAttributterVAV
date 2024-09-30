@@ -1,5 +1,5 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 import io
 
 def overskriv_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_overwrite):
@@ -53,48 +53,57 @@ def oppdater_informasjon(innmaaling_df):
 
     return innmaaling_df
 
-st.title("Oppdater Attributter")
+# Del applikasjonen i to kolonner
+col1, col2 = st.columns(2)
 
-uploaded_innmaaling_file = st.file_uploader("Last opp innmålingsfilen (Excel)", type="xlsx")
-uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx")
+# Venstre kolonne: Dropdowns og valg
+with col1:
+    st.header("Innstillinger")
 
-if uploaded_innmaaling_file and uploaded_attributter_file:
-    innmaaling_df = pd.read_excel(uploaded_innmaaling_file)
-    attributter_df = pd.read_excel(uploaded_attributter_file)
-    
-    koblingsnokkel = st.selectbox("Velg koblingsnøkkel", attributter_df.columns)
+    uploaded_innmaaling_file = st.file_uploader("Last opp innmålingsfilen (Excel)", type="xlsx")
+    uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx")
 
-    # Fjern de uønskede attributtene fra utvalget
-    uønskede_attributter = ["Id", "Lengde", "Lengde 3D", "Lukket", "Areal"]
-    tilgjengelige_attributter = [col for col in attributter_df.columns if col not in uønskede_attributter]
+    if uploaded_innmaaling_file and uploaded_attributter_file:
+        innmaaling_df = pd.read_excel(uploaded_innmaaling_file)
+        attributter_df = pd.read_excel(uploaded_attributter_file)
+        
+        koblingsnokkel = st.selectbox("Velg koblingsnøkkel", attributter_df.columns)
 
-    if st.checkbox("Overskriv attributter"):
-        attributes_to_overwrite = st.multiselect("Velg attributter som skal overskrives", tilgjengelige_attributter)
-        if st.button("Overskriv"):
-            innmaaling_df = overskriv_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_overwrite)
-            st.success("Attributter har blitt overskrevet.")
-    
-    if st.checkbox("Legg til attributter"):
-        attributes_to_add = st.multiselect("Velg attributter som skal legges til", tilgjengelige_attributter)
-        if st.button("Legg til"):
-            innmaaling_df = legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_add)
-            st.success("Attributter har blitt lagt til.")
-    
-    if st.button("Oppdater lengdeverdi i informasjon"):
-        innmaaling_df = oppdater_informasjon(innmaaling_df)
-        st.success("Lengdeverdi i informasjon er oppdatert.")
-    
-    st.write("Oppdatert DataFrame:")
-    st.dataframe(innmaaling_df)
+        # Fjern uønskede attributter fra valgene
+        uønskede_attributter = ["Id", "Lengde", "Lengde 3D", "Lukket", "Areal"]
+        tilgjengelige_attributter = [col for col in attributter_df.columns if col not in uønskede_attributter]
 
-    # Legg til nedlastingsknappen
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        innmaaling_df.to_excel(writer, index=False)
-    st.download_button(
-        label="Last ned oppdatert Excel-fil",
-        data=output.getvalue(),
-        file_name="oppdatert_innmaaling.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+        if st.checkbox("Overskriv attributter"):
+            attributes_to_overwrite = st.multiselect("Velg attributter som skal overskrives", tilgjengelige_attributter)
+            if st.button("Overskriv"):
+                innmaaling_df = overskriv_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_overwrite)
+                st.success("Attributter har blitt overskrevet.")
+        
+        if st.checkbox("Legg til attributter"):
+            attributes_to_add = st.multiselect("Velg attributter som skal legges til", tilgjengelige_attributter)
+            if st.button("Legg til"):
+                innmaaling_df = legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_add)
+                st.success("Attributter har blitt lagt til.")
+        
+        if st.button("Oppdater lengdeverdi i informasjon"):
+            innmaaling_df = oppdater_informasjon(innmaaling_df)
+            st.success("Lengdeverdi i informasjon er oppdatert.")
 
+# Høyre kolonne: Visning av data og nedlastingsmulighet
+with col2:
+    st.header("Data og nedlasting")
+
+    if uploaded_innmaaling_file and uploaded_attributter_file:
+        st.write("Oppdatert DataFrame:")
+        st.dataframe(innmaaling_df)
+
+        # Legg til nedlastingsknappen
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            innmaaling_df.to_excel(writer, index=False)
+        st.download_button(
+            label="Last ned oppdatert Excel-fil",
+            data=output.getvalue(),
+            file_name="oppdatert_innmaaling.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
