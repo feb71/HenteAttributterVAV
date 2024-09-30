@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import io
 
+# Sett appen til fullskjerm-bredde
+st.set_page_config(layout="wide")
+
 def overskriv_attributter(innmaaling_df, attributter_df, koblingsnokkel, attributes_to_overwrite):
     for _, rad in attributter_df.iterrows():
         matching_rows = innmaaling_df[innmaaling_df[koblingsnokkel] == rad[koblingsnokkel]]
@@ -53,15 +56,18 @@ def oppdater_informasjon(innmaaling_df):
 
     return innmaaling_df
 
-# Del applikasjonen i to kolonner
-col1, col2 = st.columns(2)
+# Del applikasjonen i to kolonner med venstre kolonne 1/4 bredde og høyre kolonne 3/4 bredde
+col1, col2 = st.columns([1, 3])
 
 # Venstre kolonne: Dropdowns og valg
 with col1:
     st.header("Innstillinger")
+    
+    # Vil senere flytte filopplaster til høyre kolonne
 
-    uploaded_innmaaling_file = st.file_uploader("Last opp innmålingsfilen (Excel)", type="xlsx")
-    uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx")
+    # Kun plassere valg i venstre kolonne
+    uploaded_innmaaling_file = st.file_uploader("Last opp innmålingsfilen (Excel)", type="xlsx", key="innmaaling_file")
+    uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx", key="attributter_file")
 
     if uploaded_innmaaling_file and uploaded_attributter_file:
         innmaaling_df = pd.read_excel(uploaded_innmaaling_file)
@@ -89,12 +95,13 @@ with col1:
             innmaaling_df = oppdater_informasjon(innmaaling_df)
             st.success("Lengdeverdi i informasjon er oppdatert.")
 
-# Høyre kolonne: Visning av data og nedlastingsmulighet
+# Høyre kolonne: Filopplasting, visning av data og nedlastingsmulighet
 with col2:
-    st.header("Data og nedlasting")
-
+    st.header("Opplasting og Data")
+    
+    # Visning av filopplaster-bokser
     if uploaded_innmaaling_file and uploaded_attributter_file:
-        st.write("Oppdatert DataFrame:")
+        st.subheader("Visning av DataFrame:")
         st.dataframe(innmaaling_df)
 
         # Legg til nedlastingsknappen
