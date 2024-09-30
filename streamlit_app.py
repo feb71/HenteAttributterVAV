@@ -97,7 +97,7 @@ with col1:
 
 # Høyre kolonne: Filopplasting, visning av data og nedlastingsmulighet
 with col2:
-    st.header("Opplasting og Data")
+    st.header("Oppdatere atteributter VAV")
     
     # Visning av filopplaster-bokser
     if uploaded_innmaaling_file and uploaded_attributter_file:
