@@ -63,9 +63,7 @@ col1, col2 = st.columns([1, 5])
 with col1:
     st.header("Innstillinger")
     
-    # Vil senere flytte filopplaster til høyre kolonne
-
-    # Kun plassere valg i venstre kolonne
+    # Filopplasting
     uploaded_innmaaling_file = st.file_uploader("Last opp innmålingsfilen (Excel)", type="xlsx", key="innmaaling_file")
     uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx", key="attributter_file")
 
@@ -94,12 +92,17 @@ with col1:
         if st.button("Oppdater lengdeverdi i informasjon"):
             innmaaling_df = oppdater_informasjon(innmaaling_df)
             st.success("Lengdeverdi i informasjon er oppdatert.")
+        
+        # Formater Datafangstdato til åååå-mm-dd
+        if 'Datafangstdato' in innmaaling_df.columns:
+            innmaaling_df['Datafangstdato'] = pd.to_datetime(innmaaling_df['Datafangstdato']).dt.strftime('%Y-%m-%d')
+            st.success("Datafangstdato er formatert til åååå-mm-dd.")
 
 # Høyre kolonne: Filopplasting, visning av data og nedlastingsmulighet
 with col2:
     st.header("Oppdatere atteributter VAV")
     
-    # Visning av filopplaster-bokser
+    # Visning av DataFrame
     if uploaded_innmaaling_file and uploaded_attributter_file:
         st.subheader("Visning av DataFrame:")
         st.dataframe(innmaaling_df)
