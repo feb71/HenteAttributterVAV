@@ -98,6 +98,8 @@ with col1:
         if 'Datafangstdato' in innmaaling_df.columns:
             innmaaling_df['Datafangstdato'] = pd.to_datetime(innmaaling_df['Datafangstdato'], errors='coerce').dt.date
             st.success("Datafangstdato er formatert til åååå-mm-dd.")
+        
+        # LokalId behandles som tekst, ingen endring nødvendig for formatering
 
 # Høyre kolonne: Filopplasting, visning av data og nedlastingsmulighet
 with col2:
