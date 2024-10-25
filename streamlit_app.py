@@ -41,7 +41,7 @@ def oppdater_informasjon(innmaaling_df):
             siste_profilnr_str = f'{siste_profilnr:.2f}'.replace('.', ',')
 
             if pd.isna(informasjon) or informasjon.strip() == "":
-                ny_informasjon = f'Materiale: {materiale}\nLengde: {siste_profilnr_str}'
+                ny_informasjon = f'Materiale: {materiale}\\nLengde: {siste_profilnr_str}'
             else:
                 informasjon = str(informasjon)
                 if 'Lengde: ' in informasjon:
@@ -50,7 +50,7 @@ def oppdater_informasjon(innmaaling_df):
                         f'Lengde: {siste_profilnr_str}'
                     )
                 else:
-                    ny_informasjon = informasjon + f' \nLengde: {siste_profilnr_str}'
+                    ny_informasjon = informasjon + f' \\nLengde: {siste_profilnr_str}'
 
             innmaaling_df.loc[start_index, 'informasjon'] = ny_informasjon
 
