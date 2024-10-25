@@ -93,9 +93,9 @@ with col1:
             innmaaling_df = oppdater_informasjon(innmaaling_df)
             st.success("Lengdeverdi i informasjon er oppdatert.")
         
-        # Formater Datafangstdato til åååå-mm-dd
+        # Formater Datafangstdato til åååå-mm-dd uten klokkeslett
         if 'Datafangstdato' in innmaaling_df.columns:
-            innmaaling_df['Datafangstdato'] = pd.to_datetime(innmaaling_df['Datafangstdato']).dt.strftime('%Y-%m-%d')
+            innmaaling_df['Datafangstdato'] = pd.to_datetime(innmaaling_df['Datafangstdato'], errors='coerce').dt.date
             st.success("Datafangstdato er formatert til åååå-mm-dd.")
 
 # Høyre kolonne: Filopplasting, visning av data og nedlastingsmulighet
