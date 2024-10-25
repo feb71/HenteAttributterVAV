@@ -63,13 +63,14 @@ col1, col2 = st.columns([1, 5])
 with col1:
     st.header("Innstillinger")
     
-    # Filopplasting
+    # Vil senere flytte filopplaster til høyre kolonne
+
+    # Kun plassere valg i venstre kolonne
     uploaded_innmaaling_file = st.file_uploader("Last opp innmålingsfilen (Excel)", type="xlsx", key="innmaaling_file")
     uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx", key="attributter_file")
 
     if uploaded_innmaaling_file and uploaded_attributter_file:
-        # Les inn Excel og sørg for at LokalId blir lest som tekst
-        innmaaling_df = pd.read_excel(uploaded_innmaaling_file, dtype={'LokalId': str})
+        innmaaling_df = pd.read_excel(uploaded_innmaaling_file)
         attributter_df = pd.read_excel(uploaded_attributter_file)
         
         koblingsnokkel = st.selectbox("Velg koblingsnøkkel", attributter_df.columns)
@@ -93,19 +94,12 @@ with col1:
         if st.button("Oppdater lengdeverdi i informasjon"):
             innmaaling_df = oppdater_informasjon(innmaaling_df)
             st.success("Lengdeverdi i informasjon er oppdatert.")
-        
-        # Formater Datafangstdato til åååå-mm-dd uten klokkeslett
-        if 'Datafangstdato' in innmaaling_df.columns:
-            innmaaling_df['Datafangstdato'] = pd.to_datetime(innmaaling_df['Datafangstdato'], errors='coerce').dt.date
-            st.success("Datafangstdato er formatert til åååå-mm-dd.")
-        
-        # LokalId behandles som tekst, ingen endring nødvendig for formatering
 
 # Høyre kolonne: Filopplasting, visning av data og nedlastingsmulighet
 with col2:
     st.header("Oppdatere atteributter VAV")
     
-    # Visning av DataFrame
+    # Visning av filopplaster-bokser
     if uploaded_innmaaling_file and uploaded_attributter_file:
         st.subheader("Visning av DataFrame:")
         st.dataframe(innmaaling_df)
@@ -119,4 +113,4 @@ with col2:
             data=output.getvalue(),
             file_name="oppdatert_innmaaling.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        ) 
