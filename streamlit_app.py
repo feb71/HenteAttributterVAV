@@ -68,7 +68,7 @@ with col1:
     uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx", key="attributter_file")
 
     if uploaded_innmaaling_file and uploaded_attributter_file:
-        # Sørg for at LokalId blir lest som streng
+        # Les inn Excel og sørg for at LokalId blir lest som tekst
         innmaaling_df = pd.read_excel(uploaded_innmaaling_file, dtype={'LokalId': str})
         attributter_df = pd.read_excel(uploaded_attributter_file)
         
@@ -96,7 +96,7 @@ with col1:
         
         # Formater Datafangstdato til åååå-mm-dd uten klokkeslett
         if 'Datafangstdato' in innmaaling_df.columns:
-            innmaaling_df['Datafangstdato'] = pd.to_datetime(innmaaling_df['Datafangstdato'], errors='coerce').dt.strftime('%Y-%m-%d')
+            innmaaling_df['Datafangstdato'] = pd.to_datetime(innmaaling_df['Datafangstdato'], errors='coerce').dt.date
             st.success("Datafangstdato er formatert til åååå-mm-dd.")
 
 # Høyre kolonne: Filopplasting, visning av data og nedlastingsmulighet
