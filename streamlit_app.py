@@ -24,18 +24,27 @@ def legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attribut
     return innmaaling_df
 
 def oppdater_informasjon(innmaaling_df):
-    for idx, row in innmaaling_df.iterrows():
-        siste_profilnr = row['Profilnr']
-        siste_profilnr_str = f'{siste_profilnr:.2f}'.replace('.', ',')
+    linje_start_indexes = innmaaling_df[innmaaling_df['Id'].notna()].index.tolist()
+    linje_start_indexes.append(len(innmaaling_df))  # Legg til slutten av DataFrame som en grense
 
-        if pd.notna(row['informasjon']) and "Lengde: " in row['informasjon']:
-            start = row['informasjon'].split('Lengde: ')[0] + 'Lengde: '
-            ny_informasjon = start + siste_profilnr_str
-            innmaaling_df.at[idx, 'informasjon'] = ny_informasjon
-        elif pd.notna(row['informasjon']):
-            innmaaling_df.at[idx, 'informasjon'] = row['informasjon'] + f' \\nLengde: {siste_profilnr_str}'
-        else:
-            innmaaling_df.at[idx, 'informasjon'] = f'Lengde: {siste_profilnr_str}'
+    for i in range(len(linje_start_indexes) - 1):
+        start_index = linje_start_indexes[i]
+        end_index = linje_start_indexes[i + 1]
+        linje_segment = innmaaling_df.iloc[start_index:end_index]
+
+        # Oppdater kun første rad i hver linje-segment
+        if not linje_segment.empty:
+            siste_rad_index = linje_segment.index[-1]
+            siste_profilnr = innmaaling_df.loc[siste_rad_index, 'Profilnr']
+            materiale = innmaaling_df.loc[start_index, 'materiale']
+
+            # Formater lengdeverdi med komma som desimalskilletegn
+            siste_profilnr_str = f'{siste_profilnr:.2f}'.replace('.', ',')
+
+            # Oppdater kun informasjon for den første raden i segmentet
+            ny_informasjon = f'Materiale: {materiale}\\nLengde: {siste_profilnr_str}'
+            innmaaling_df.loc[start_index, 'informasjon'] = ny_informasjon
+
     return innmaaling_df
 
 # Del appen i to kolonner for layout
