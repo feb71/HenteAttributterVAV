@@ -24,8 +24,11 @@ def legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attribut
     return innmaaling_df
 
 def oppdater_informasjon(innmaaling_df):
-    # Lagre lokalid for å unngå sletting eller endring
-    lokalid_backup = innmaaling_df['LokalId'].copy()
+    if 'lokalId' not in innmaaling_df.columns:
+        st.error("Kolonnen 'lokalId' mangler i dataene. Vennligst kontroller filen.")
+        return innmaaling_df  # Returner uendret DataFrame hvis lokalId mangler
+    
+    lokalid_backup = innmaaling_df['lokalId'].copy()  # Bruk riktig navn for kolonnen
 
     linje_start_indexes = innmaaling_df[innmaaling_df['Id'].notna()].index.tolist()
     linje_start_indexes.append(len(innmaaling_df))
@@ -57,9 +60,7 @@ def oppdater_informasjon(innmaaling_df):
 
             innmaaling_df.loc[start_index, 'informasjon'] = ny_informasjon
 
-    # Gjenopprett LokalId for å sikre at det ikke endres
-    innmaaling_df['LokalId'] = lokalid_backup
-
+    innmaaling_df['lokalId'] = lokalid_backup  # Gjenopprett lokalId-kolonnen
     return innmaaling_df
 
 # Del applikasjonen i to kolonner med venstre kolonne 1/4 bredde og høyre kolonne 3/4 bredde
@@ -74,8 +75,8 @@ with col1:
     uploaded_attributter_file = st.file_uploader("Last opp attributtfilen (Excel)", type="xlsx", key="attributter_file")
 
     if uploaded_innmaaling_file and uploaded_attributter_file:
-        # Les inn Excel og sørg for at LokalId blir lest som tekst
-        innmaaling_df = pd.read_excel(uploaded_innmaaling_file, dtype={'LokalId': str})
+        # Les inn Excel-filen
+        innmaaling_df = pd.read_excel(uploaded_innmaaling_file)
         attributter_df = pd.read_excel(uploaded_attributter_file)
         
         koblingsnokkel = st.selectbox("Velg koblingsnøkkel", attributter_df.columns)
