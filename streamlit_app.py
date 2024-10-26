@@ -57,6 +57,9 @@ with col1:
         uønskede_attributter = ["Id", "Lengde", "Lengde 3D", "Lukket", "Areal"]
         tilgjengelige_attributter = [col for col in attributter_df.columns if col not in uønskede_attributter]
 
+        attributes_to_overwrite = []
+        attributes_to_add = []
+
         if st.checkbox("Overskriv attributter"):
             attributes_to_overwrite = st.multiselect("Velg attributter som skal overskrives", tilgjengelige_attributter)
         
