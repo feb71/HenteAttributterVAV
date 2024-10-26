@@ -69,6 +69,10 @@ with col1:
         
         koblingsnokkel = st.selectbox("Velg koblingsnøkkel", attributter_df.columns)
 
+        # Vis attributter DataFrame for å hjelpe brukeren med å velge kolonner
+        st.subheader("Forhåndsvisning av attributtfilen:")
+        st.dataframe(attributter_df)
+
         uønskede_attributter = ["Id", "Lengde", "Lengde 3D", "Lukket", "Areal"]
         tilgjengelige_attributter = [col for col in attributter_df.columns if col not in uønskede_attributter]
 
