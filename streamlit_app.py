@@ -24,45 +24,23 @@ def legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attribut
     return innmaaling_df
 
 def oppdater_informasjon(innmaaling_df):
-    # Lagre en sikkerhetskopi av alle andre kolonner enn 'informasjon'
-    original_data = innmaaling_df.drop(columns=['informasjon']).copy()
-    
-    linje_start_indexes = innmaaling_df[innmaaling_df['Id'].notna()].index.tolist()
-    linje_start_indexes.append(len(innmaaling_df))
+    # Iterér gjennom hver rad og oppdater kun lengdetallet i informasjon
+    for idx, row in innmaaling_df.iterrows():
+        siste_profilnr = row['Profilnr']
+        
+        # Formater lengdetallet
+        siste_profilnr_str = f'{siste_profilnr:.2f}'.replace('.', ',')
 
-    for i in range(len(linje_start_indexes) - 1):
-        start_index = linje_start_indexes[i]
-        end_index = linje_start_indexes[i + 1]
-        linje_segment = innmaaling_df.iloc[start_index:end_index]
-
-        if not linje_segment.empty:
-            siste_rad_index = linje_segment.index[-1]
-            siste_profilnr = innmaaling_df.loc[siste_rad_index, 'Profilnr']
-            informasjon = innmaaling_df.loc[start_index, 'informasjon']
-            materiale = innmaaling_df.loc[start_index, 'materiale']
-
-            # Formater lengdeverdi med komma som desimalskilletegn
-            siste_profilnr_str = f'{siste_profilnr:.2f}'.replace('.', ',')
-
-            # Oppdater kun informasjon-kolonnen
-            if pd.isna(informasjon) or informasjon.strip() == "":
-                ny_informasjon = f'Materiale: {materiale}\\nLengde: {siste_profilnr_str}'
-            else:
-                informasjon = str(informasjon)
-                if 'Lengde: ' in informasjon:
-                    ny_informasjon = informasjon.replace(
-                        'Lengde: ' + str(informasjon.split('Lengde: ')[1].split()[0]),
-                        f'Lengde: {siste_profilnr_str}'
-                    )
-                else:
-                    ny_informasjon = informasjon + f' \\nLengde: {siste_profilnr_str}'
-
-            # Sett ny verdi i 'informasjon'-kolonnen
-            innmaaling_df.loc[start_index, 'informasjon'] = ny_informasjon
-
-    # Gjenopprett alle andre kolonner fra sikkerhetskopien
-    for col in original_data.columns:
-        innmaaling_df[col] = original_data[col]
+        # Hvis informasjon inneholder "Lengde: ", bytt kun ut lengdetallet etter "Lengde: "
+        if pd.notna(row['informasjon']) and "Lengde: " in row['informasjon']:
+            start = row['informasjon'].split('Lengde: ')[0] + 'Lengde: '
+            ny_informasjon = start + siste_profilnr_str
+            innmaaling_df.at[idx, 'informasjon'] = ny_informasjon
+        # Hvis informasjon mangler eller ikke har "Lengde: ", legg til lengdeinformasjonen
+        elif pd.notna(row['informasjon']):
+            innmaaling_df.at[idx, 'informasjon'] = row['informasjon'] + f' \\nLengde: {siste_profilnr_str}'
+        else:
+            innmaaling_df.at[idx, 'informasjon'] = f'Lengde: {siste_profilnr_str}'
 
     return innmaaling_df
 
