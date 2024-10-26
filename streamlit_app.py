@@ -24,7 +24,9 @@ def legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attribut
     return innmaaling_df
 
 def oppdater_informasjon(innmaaling_df):
-    # Oppdater kun kolonnen 'informasjon' basert på Profilnr og materiale
+    # Lagre en sikkerhetskopi av alle andre kolonner enn 'informasjon'
+    original_data = innmaaling_df.drop(columns=['informasjon']).copy()
+    
     linje_start_indexes = innmaaling_df[innmaaling_df['Id'].notna()].index.tolist()
     linje_start_indexes.append(len(innmaaling_df))
 
@@ -39,7 +41,7 @@ def oppdater_informasjon(innmaaling_df):
             informasjon = innmaaling_df.loc[start_index, 'informasjon']
             materiale = innmaaling_df.loc[start_index, 'materiale']
 
-            # Formatér siste_profilnr som en streng med komma som desimalskilletegn
+            # Formater lengdeverdi med komma som desimalskilletegn
             siste_profilnr_str = f'{siste_profilnr:.2f}'.replace('.', ',')
 
             # Oppdater kun informasjon-kolonnen
@@ -55,8 +57,12 @@ def oppdater_informasjon(innmaaling_df):
                 else:
                     ny_informasjon = informasjon + f' \\nLengde: {siste_profilnr_str}'
 
-            # Oppdater kun informasjon-kolonnen
+            # Sett ny verdi i 'informasjon'-kolonnen
             innmaaling_df.loc[start_index, 'informasjon'] = ny_informasjon
+
+    # Gjenopprett alle andre kolonner fra sikkerhetskopien
+    for col in original_data.columns:
+        innmaaling_df[col] = original_data[col]
 
     return innmaaling_df
 
