@@ -24,11 +24,8 @@ def legg_til_attributter(innmaaling_df, attributter_df, koblingsnokkel, attribut
     return innmaaling_df
 
 def oppdater_informasjon(innmaaling_df):
-    if 'lokalId' not in innmaaling_df.columns:
-        st.error("Kolonnen 'lokalId' mangler i dataene. Vennligst kontroller filen.")
-        return innmaaling_df  # Returner uendret DataFrame hvis lokalId mangler
-    
-    lokalid_backup = innmaaling_df['lokalId'].copy()  # Bruk riktig navn for kolonnen
+    # Sikkerhetskopi av 'lokalId' kolonnen
+    lokalid_backup = innmaaling_df['lokalId'].copy()
 
     linje_start_indexes = innmaaling_df[innmaaling_df['Id'].notna()].index.tolist()
     linje_start_indexes.append(len(innmaaling_df))
@@ -60,7 +57,9 @@ def oppdater_informasjon(innmaaling_df):
 
             innmaaling_df.loc[start_index, 'informasjon'] = ny_informasjon
 
-    innmaaling_df['lokalId'] = lokalid_backup  # Gjenopprett lokalId-kolonnen
+    # Gjenopprett 'lokalId'-kolonnen etter oppdateringer
+    innmaaling_df['lokalId'] = lokalid_backup
+
     return innmaaling_df
 
 # Del applikasjonen i to kolonner med venstre kolonne 1/4 bredde og høyre kolonne 3/4 bredde
