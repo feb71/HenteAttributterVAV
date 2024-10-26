@@ -47,6 +47,12 @@ def oppdater_informasjon(innmaaling_df):
 
     return innmaaling_df
 
+def format_datafangstdato(df):
+    # Formatér datafangstdato til 'åååå-mm-dd' uten klokkeslett
+    if 'datafangstdato' in df.columns:
+        df['datafangstdato'] = pd.to_datetime(df['datafangstdato'], errors='coerce').dt.strftime('%Y-%m-%d')
+    return df
+
 # Del appen i to kolonner for layout
 col1, col2 = st.columns([1, 5])
 
@@ -84,7 +90,8 @@ with col1:
                 st.success("Attributter har blitt lagt til.")
             
             innmaaling_df = oppdater_informasjon(innmaaling_df)
-            st.success("Lengdeverdi i informasjon er oppdatert.")
+            innmaaling_df = format_datafangstdato(innmaaling_df)
+            st.success("Lengdeverdi i informasjon og datafangstdato er oppdatert.")
 
 # Høyre kolonne: Visning av oppdatert data og nedlastingsmulighet
 with col2:
